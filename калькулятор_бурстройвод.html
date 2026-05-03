@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор БУРСТРОЙВОД — Опросник для менеджера</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .content { padding: 30px; }
+        .section {
+            margin-bottom: 30px;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 25px;
+            background: #fafafa;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .icon {
+            width: 32px; height: 32px;
+            background: #1565c0;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21,101,192,0.1);
+        }
+        .form-group input[type="number"] {
+            font-weight: 600;
+            color: #1565c0;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .checkbox-item:hover { border-color: #1565c0; }
+        .checkbox-item.active {
+            border-color: #1565c0;
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+        .checkbox-item input { display: none; }
+        .btn-calculate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0;
+        }
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(67,160,71,0.4);
+        }
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        .results.show { display: block; }
+        .result-card {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .result-card h3 {
+            color: #1565c0;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2e7d32;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .result-table th {
+            background: #1565c0;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .result-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .result-table tr:hover { background: #f5f5f5; }
+        .result-table .price-cell {
+            font-weight: 700;
+            color: #1565c0;
+            text-align: right;
+        }
+        .recommendation {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .recommendation strong {
+            color: #e65100;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        .badge-recommended { background: #e8f5e9; color: #2e7d32; }
+        .badge-economy { background: #e3f2fd; color: #1565c0; }
+        .badge-premium { background: #fce4ec; color: #c62828; }
+        .total-section {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .total-section h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .total-price {
+            font-size: 42px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .total-detail {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .total-item {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .total-item .label { opacity: 0.8; font-size: 12px; }
+        .total-item .value { font-size: 18px; font-weight: 700; }
+        .hidden { display: none !important; }
+        .conditional-section {
+            border: 2px dashed #bdbdbd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            background: #fafafa;
+        }
+        .conditional-section.show {
+            border-color: #1565c0;
+            background: #f5f9ff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn-calculate {
+            flex: 2;
+        }
+        .btn-clear {
+            flex: 1;
+            padding: 18px;
+            background: linear-gradient(135deg, #ef5350, #c62828);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(198,40,40,0.4);
+        }
+        @media print {
+            body { background: white; }
+            .btn-calculate, .header { display: none; }
+            .container { box-shadow: none; }
+            .results { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Калькулятор БУРСТРОЙВОД</h1>
+            <p>Опросник для менеджера → Автоматический подбор решений с ценами</p>
+        </div>
+
+        <div class="content">
+            <!-- ОБЩИЕ ПАРАМЕТРЫ -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">📋</div>
+                    Общие параметры объекта
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Расстояние до объекта (км)</label>
+                        <input type="number" id="distance" value="25" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Глубина скважины (м)</label>
+                        <input type="number" id="depth" value="40" min="10" max="150">
+                    </div>
+                    <div class="form-group">
+                        <label>УГВ (уровень грунтовых вод)</label>
+                        <select id="ugv">
+                            <option value="normal">Нормальный (до 5м)</option>
+                            <option value="high">Высокий (до 2м)</option>
+                            <option value="very_high">Очень высокий (на поверхности)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Назначение скважины</label>
+                        <select id="purpose">
+                            <option value="drinking">Питьевая вода</option>
+                            <option value="technical">Техническая вода</option>
+                            <option value="irrigation">Полив</option>
+                            <option value="combo">Комбинированное</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БУРЕНИЕ -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">🎯</div>
+                    Бурение скважины
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Диаметр обсадной трубы</label>
+                        <select id="pipe_diameter">
+                            <option value="125">НПВХ 125 мм (стандарт)</option>
+                            <option value="140">НПВХ 140 мм</option>
+                            <option value="160">НПВХ 160 мм (усиленная)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Нужен кондуктор?</label>
+                        <select id="conductor">
+                            <option value="no">Нет</option>
+                            <option value="yes">Да (+39 000 ₽)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Осложнения</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="diff_rock"> Твердый грунт
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="diff_sand"> Плывун
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="diff_clay"> Глина
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НАСОС -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">🔌</div>
+                    Насосное оборудование
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Потребность в воде</label>
+                        <select id="water_need">
+                            <option value="low">До 2 м³/ч (дом до 3 чел.)</option>
+                            <option value="medium" selected>2-3 м³/ч (дом 3-5 чел.)</option>
+                            <option value="high">3-4 м³/ч (дом 5-8 чел.)</option>
+                            <option value="very_high">4+ м³/ч (большой дом, полив)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Тип насоса</label>
+                        <select id="pump_type">
+                            <option value="auto">Автоподбор по параметрам</option>
+                            <option value="vinnovik">Винтовик (бюджет)</option>
+                            <option value="vodomet">Водомет (стандарт)</option>
+                            <option value="vodomet_3d">Водомет 3D (премиум)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Длина троса (м)</label>
+                        <input type="number" id="cable_length" value="45">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ОБУСТРОЙСТВО -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">🏠</div>
+                    Обустройство скважины
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Тип обустройства</label>
+                        <select id="kesson_type" onchange="updateKessonOptions()">
+                            <option value="none">Не выбрано</option>
+                            <option value="adapter">Скважинный адаптер (бюджет)</option>
+                            <option value="plastik">Пластиковый кессон</option>
+                            <option value="plastik_vug">Пластиковый кессон в ВУГ</option>
+                            <option value="jbi_1m">ЖБИ кессон Ø1м</option>
+                            <option value="jbi_1_5m">ЖБИ кессон Ø1,5м</option>
+                            <option value="jbi_2m">ЖБИ кессон Ø2м</option>
+                            <option value="mini">Мини-кессон ПП 750*500</option>
+                            <option value="pp_1100_1200">Кессон ПП 1100*1200</option>
+                            <option value="pp_1100_1900">Кессон ПП 1100*1900</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Погреб в кессоне?</label>
+                        <select id="pogreb">
+                            <option value="no">Нет</option>
+                            <option value="yes">Да</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Дополнительно</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="add_uteplenie"> Утепление
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="add_gidro"> Гидроизоляция
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВВОД ВОДЫ -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">💧</div>
+                    Ввод воды в дом
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Расстояние до дома (м)</label>
+                        <input type="number" id="water_distance" value="15" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Глубина промерзания</label>
+                        <select id="freeze_depth">
+                            <option value="1m">До 1м (южные районы)</option>
+                            <option value="1_8m" selected>До 1,8м (Тюмень, стандарт)</option>
+                            <option value="2_5m">До 2,5м (северные районы)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- АВТОМАТИКА -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">⚡</div>
+                    Автоматика
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Тип автоматики</label>
+                        <select id="auto_type">
+                            <option value="none">Не нужна</option>
+                            <option value="rele" selected>Реле давления (стандарт)</option>
+                            <option value="chastotnik">Частотный преобразователь (премиум)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Гидроаккумулятор</label>
+                        <select id="hydro_type">
+                            <option value="none">Не нужен</option>
+                            <option value="24">24 л (минимальный)</option>
+                            <option value="50" selected>50 л (стандарт)</option>
+                            <option value="100">100 л (большой дом)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Доп. оборудование</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="add_filter"> Фильтр
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" id="add_poliv"> Летний полив
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- КАНАЛИЗАЦИЯ -->
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">🚿</div>
+                    Канализация и септик
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Нужна канализация?</label>
+                        <select id="need_kanal" onchange="toggleKanal()">
+                            <option value="no">Нет</option>
+                            <option value="yes">Да</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="kanal_section" class="conditional-section hidden">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Длина канализации (м)</label>
+                            <input type="number" id="kanal_length" value="10" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Тип септика</label>
+                            <select id="septik_type">
+                                <option value="none">Не нужен</option>
+                                <option value="drenaj">Дренажный колодец</option>
+                                <option value="jbi">ЖБИ септик</option>
+                                <option value="metal">Металлический септик</option>
+                                <option value="aos">АОС (станция биоочистки)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Количество проживающих</label>
+                            <input type="number" id="people_count" value="4" min="1" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label>Режим проживания</label>
+                            <select id="living_mode">
+                                <option value="permanent">Постоянный</option>
+                                <option value="seasonal">Сезонный</option>
+                                <option value="weekend">Выходного дня</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-calculate" onclick="calculate()">
+                    🚀 Рассчитать и подобрать варианты
+                </button>
+                <button class="btn-clear" onclick="clearForm()" type="button">
+                    🔄 Очистить все поля
+                </button>
+            </div>
+
+            <!-- РЕЗУЛЬТАТЫ -->
+            <div id="results" class="results">
+                <div class="total-section">
+                    <h2>📊 Итоговый расчет</h2>
+                    <div class="total-price" id="total_price">0 ₽</div>
+                    <div class="total-detail">
+                        <div class="total-item">
+                            <div class="label">Бурение</div>
+                            <div class="value" id="total_burenie">0 ₽</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="label">Насос + обвязка</div>
+                            <div class="value" id="total_nasos">0 ₽</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="label">Обустройство</div>
+                            <div class="value" id="total_obust">0 ₽</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="label">Ввод воды</div>
+                            <div class="value" id="total_vvod">0 ₽</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="label">Автоматика</div>
+                            <div class="value" id="total_avto">0 ₽</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="label">Канализация</div>
+                            <div class="value" id="total_kanal">0 ₽</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="recommendations"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === ДАННЫЕ ===
+        const BURENIE = {
+            '125': { name: 'НПВХ 125 мм', sebest: 1306.97, roz: 1600, doch: 293.03 },
+            '140': { name: 'НПВХ 140 мм', sebest: 1416.97, roz: 1700, doch: 283.03 },
+            '160': { name: 'НПВХ 160 мм', sebest: 1913.15, roz: 2000, doch: 86.85 }
+        };
+
+        const NASOSY = [
+            { name: 'Винтовик 35/80', sebest: 6030, roz: 9000, debit: 2, depth: 35, type: 'vinnovik' },
+            { name: 'Винтовик 35/95', sebest: 6700, roz: 10000, debit: 2.5, depth: 35, type: 'vinnovik' },
+            { name: 'Винтовик 35/110', sebest: 7370, roz: 11000, debit: 3, depth: 35, type: 'vinnovik' },
+            { name: 'Водомет 40/50', sebest: 10720, roz: 16000, debit: 2, depth: 40, type: 'vodomet' },
+            { name: 'Водомет 40/75', sebest: 12730, roz: 19000, debit: 3, depth: 40, type: 'vodomet' },
+            { name: 'Водомет 55/75', sebest: 13869, roz: 20700, debit: 3, depth: 55, type: 'vodomet' },
+            { name: 'Водомет 55/90', sebest: 19899, roz: 29700, debit: 4, depth: 55, type: 'vodomet' },
+            { name: 'Водомет 75/75', sebest: 15410, roz: 23000, debit: 3, depth: 75, type: 'vodomet' },
+            { name: 'Водомет 110/110', sebest: 26532, roz: 39600, debit: 5, depth: 110, type: 'vodomet' },
+            { name: 'Водомет 3д 55/50', sebest: 10988, roz: 16400, debit: 2, depth: 55, type: 'vodomet_3d' },
+            { name: 'Водомет 3д 55/70', sebest: 13869, roz: 20700, debit: 3, depth: 55, type: 'vodomet_3d' },
+            { name: 'Водомет 3д 55/100', sebest: 20100, roz: 30000, debit: 4, depth: 55, type: 'vodomet_3d' },
+            { name: 'Водомет 45/42', sebest: 8241, roz: 12300, debit: 1.5, depth: 45, type: 'vodomet' },
+            { name: 'Водомет 45/60', sebest: 10318, roz: 15400, debit: 2.5, depth: 45, type: 'vodomet' },
+            { name: 'Водомет 45/85', sebest: 12864, roz: 19200, debit: 3.5, depth: 45, type: 'vodomet' },
+            { name: 'Водомет 45/110', sebest: 15946, roz: 23800, debit: 4.5, depth: 45, type: 'vodomet' }
+        ];
+
+        const OBUSTROISTVO = {
+            'adapter': { name: 'Скважинный адаптер', sebest: 7934, roz: 21000 },
+            'plastik': { name: 'Пластиковый кессон', sebest: 38000, roz: 50000 },
+            'plastik_vug': { name: 'Пластиковый кессон в ВУГ', sebest: 53000, roz: 65000 },
+            'jbi_1m': { name: 'ЖБИ кессон Ø1м', sebest: 37300, roz: 55000 },
+            'jbi_1_5m': { name: 'ЖБИ кессон Ø1,5м', sebest: 43300, roz: 60000 },
+            'jbi_2m': { name: 'ЖБИ кессон Ø2м', sebest: 65500, roz: 90000 },
+            'mini': { name: 'Мини-кессон ПП', sebest: 7500, roz: 17000 },
+            'pp_1100_1200': { name: 'Кессон ПП 1100×1200', sebest: 25100, roz: 43000 },
+            'pp_1100_1900': { name: 'Кессон ПП 1100×1900', sebest: 34250, roz: 60000 }
+        };
+
+        const VVOD = { '1m': 2500, '1_8m': 3200, '2_5m': 4000 };
+        const OBVYAZKA = { sebest: 5030, roz: 10900 };
+        const AVTOMATIKA = {
+            'rele': { name: 'Реле давления', sebest: 15923, roz: 37000 },
+            'chastotnik': { name: 'Частотник', sebest: 13773, roz: 35000 }
+        };
+        const HYDRO = { '24': 3150, '50': 6150, '100': 10550 };
+        const KANAL = { naruzh: 3300, tochki: 3100 };
+
+        const SEPTIKI = {
+            'drenaj_800': { name: 'Дренаж пластик 800×2000', sebest: 27800, roz: 41000 },
+            'drenaj_1000': { name: 'Дренаж пластик 1000×2000', sebest: 33800, roz: 50000 },
+            'drenaj_k1': { name: 'Дренаж ЖБИ К1', sebest: 24400, roz: 39000 },
+            'drenaj_k2': { name: 'Дренаж ЖБИ К2', sebest: 31300, roz: 49000 },
+            'jbi_1_5_k2': { name: 'ЖБИ септик 1,5м 2К2', sebest: 75090, roz: 109000 },
+            'jbi_1_5_k3': { name: 'ЖБИ септик 1,5м 2К3', sebest: 96890, roz: 139000 },
+            'jbi_2m': { name: 'ЖБИ септик Ø2м', sebest: 120700, roz: 169000 },
+            'metal_5': { name: 'Металл 5м³', sebest: 82000, roz: 120000 },
+            'metal_10': { name: 'Металл 10м³', sebest: 122000, roz: 185000 }
+        };
+
+        const AOS_ECO = [
+            { name: 'ЕВРОЛОС ЭКО 3', sebest: 70200, roz: 100100, sut: 600, zalp: 240 },
+            { name: 'ЕВРОЛОС ЭКО 4', sebest: 77300, roz: 108800, sut: 800, zalp: 340 },
+            { name: 'ЕВРОЛОС ЭКО 5', sebest: 83900, roz: 118800, sut: 1000, zalp: 440 },
+            { name: 'ЕВРОЛОС ЭКО 6', sebest: 93700, roz: 131700, sut: 1200, zalp: 540 },
+            { name: 'ЕВРОЛОС ЭКО 8', sebest: 106100, roz: 153100, sut: 1600, zalp: 710 },
+        ];
+
+        const AOS_MALAHIT = [
+            { name: 'МАЛАХИТ 4', sebest: 68200, roz: 124000, sut: 900, zalp: 220 },
+            { name: 'МАЛАХИТ 5', sebest: 74470, roz: 135400, sut: 950, zalp: 240 },
+            { name: 'МАЛАХИТ 6', sebest: 83765, roz: 152300, sut: 1200, zalp: 290 },
+            { name: 'МАЛАХИТ 8', sebest: 102410, roz: 186200, sut: 1600, zalp: 420 },
+        ];
+
+        // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+        function toggleCheckbox(el) {
+            el.classList.toggle('active');
+            const input = el.querySelector('input');
+            input.checked = !input.checked;
+        }
+
+        function toggleKanal() {
+            const val = document.getElementById('need_kanal').value;
+            const section = document.getElementById('kanal_section');
+            if (val === 'yes') {
+                section.classList.remove('hidden');
+                section.classList.add('show');
+            } else {
+                section.classList.add('hidden');
+                section.classList.remove('show');
+            }
+        }
+
+        function updateKessonOptions() {
+            // Можно добавить логику автоподбора кессона
+        }
+
+        function formatPrice(n) {
+            return Math.round(n).toLocaleString('ru-RU') + ' ₽';
+        }
+
+        // === ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА ===
+        function calculate() {
+            const depth = parseInt(document.getElementById('depth').value) || 40;
+            const pipe = document.getElementById('pipe_diameter').value;
+            const distance = parseInt(document.getElementById('distance').value) || 25;
+            const waterNeed = document.getElementById('water_need').value;
+            const pumpType = document.getElementById('pump_type').value;
+            const kessonType = document.getElementById('kesson_type').value;
+            const autoType = document.getElementById('auto_type').value;
+            const hydroType = document.getElementById('hydro_type').value;
+            const needKanal = document.getElementById('need_kanal').value === 'yes';
+            const kanalLength = parseInt(document.getElementById('kanal_length').value) || 10;
+            const peopleCount = parseInt(document.getElementById('people_count').value) || 4;
+            const freezeDepth = document.getElementById('freeze_depth').value;
+            const conductor = document.getElementById('conductor').value === 'yes';
+            const waterDistance = parseInt(document.getElementById('water_distance').value) || 15;
+
+            let total = 0;
+            let totalSebest = 0;
+            const positions = [];
+
+            // 1. БУРЕНИЕ
+            const burenieData = BURENIE[pipe];
+            const bureniePrice = burenieData.roz * depth;
+            const burenieSebest = burenieData.sebest * depth;
+            positions.push({
+                name: `Бурение скважины ${burenieData.name}`,
+                qty: depth,
+                unit: 'м',
+                price: burenieData.roz,
+                sum: bureniePrice,
+                sebest: burenieSebest
+            });
+            total += bureniePrice;
+            totalSebest += burenieSebest;
+
+            // Кондуктор
+            if (conductor) {
+                positions.push({ name: 'Установка кондуктора', qty: 1, unit: 'шт', price: 39000, sum: 39000, sebest: 27060 });
+                total += 39000;
+                totalSebest += 27060;
+            }
+
+            // Транспорт
+            const transportPrice = distance * 25;
+            positions.push({ name: 'Транспортные расходы', qty: distance, unit: 'км', price: 25, sum: transportPrice, sebest: transportPrice });
+            total += transportPrice;
+            totalSebest += transportPrice;
+
+            // 2. НАСОС
+            let selectedPump = null;
+            let debitNeed = 2;
+            if (waterNeed === 'low') debitNeed = 2;
+            else if (waterNeed === 'medium') debitNeed = 3;
+            else if (waterNeed === 'high') debitNeed = 4;
+            else debitNeed = 5;
+
+            // Фильтруем насосы
+            let suitablePumps = NASOSY.filter(p => p.debit >= debitNeed && p.depth >= depth);
+            if (suitablePumps.length === 0) suitablePumps = NASOSY.filter(p => p.depth >= depth);
+            if (suitablePumps.length === 0) suitablePumps = NASOSY;
+
+            // Сортируем по цене
+            suitablePumps.sort((a, b) => a.roz - b.roz);
+
+            if (pumpType !== 'auto') {
+                selectedPump = suitablePumps.find(p => p.type === pumpType) || suitablePumps[0];
+            } else {
+                selectedPump = suitablePumps[0]; // самый дешевый подходящий
+            }
+
+            const pumpPrice = selectedPump.roz;
+            positions.push({
+                name: `Насос ${selectedPump.name}`,
+                qty: 1, unit: 'шт', price: pumpPrice, sum: pumpPrice, sebest: selectedPump.sebest
+            });
+            total += pumpPrice;
+            totalSebest += selectedPump.sebest;
+
+            // Обвязка насоса
+            positions.push({ name: 'Обвязка насосного оборудования', qty: 1, unit: 'компл', price: 10900, sum: 10900, sebest: 5030 });
+            total += 10900;
+            totalSebest += 5030;
+
+            // Трос и труба
+            const cableLength = depth + 10;
+            const cablePrice = cableLength * 100;
+            const cableSebest = cableLength * 22;
+            positions.push({ name: 'Трос нержавеющий 3мм', qty: cableLength, unit: 'м', price: 100, sum: cablePrice, sebest: cableSebest });
+            total += cablePrice;
+            totalSebest += cableSebest;
+
+            const pndLength = cableLength;
+            const pndPrice = pndLength * 90;
+            const pndSebest = pndLength * 35;
+            positions.push({ name: 'Труба ПНД d32', qty: pndLength, unit: 'м', price: 90, sum: pndPrice, sebest: pndSebest });
+            total += pndPrice;
+            totalSebest += pndSebest;
+
+            // 3. ОБУСТРОЙСТВО
+            let obustPrice = 0;
+            let obustSebest = 0;
+            if (kessonType !== 'none') {
+                const kesson = OBUSTROISTVO[kessonType];
+                obustPrice = kesson.roz;
+                obustSebest = kesson.sebest;
+                positions.push({ name: kesson.name, qty: 1, unit: 'шт', price: kesson.roz, sum: kesson.roz, sebest: kesson.sebest });
+                total += kesson.roz;
+                totalSebest += kesson.sebest;
+
+                // Утепление
+                if (document.getElementById('add_uteplenie').checked) {
+                    let utepPrice = 0;
+                    let utepName = '';
+                    if (kessonType.includes('jbi_1m')) { utepPrice = 9000; utepName = 'Утепление ЖБИ 1м'; }
+                    else if (kessonType.includes('jbi_1_5m')) { utepPrice = 12000; utepName = 'Утепление ЖБИ 1,5м'; }
+                    else if (kessonType.includes('jbi_2m')) { utepPrice = 15000; utepName = 'Утепление ЖБИ 2м'; }
+                    if (utepPrice) {
+                        positions.push({ name: utepName, qty: 1, unit: 'шт', price: utepPrice, sum: utepPrice, sebest: utepPrice * 0.6 });
+                        total += utepPrice;
+                        totalSebest += utepPrice * 0.6;
+                    }
+                }
+
+                // Гидроизоляция
+                if (document.getElementById('add_gidro').checked) {
+                    let gidroPrice = 0;
+                    let gidroName = '';
+                    if (kessonType.includes('jbi_1m')) { gidroPrice = 6000; gidroName = 'Гидроизоляция ЖБИ 1м'; }
+                    else if (kessonType.includes('jbi_1_5m')) { gidroPrice = 8000; gidroName = 'Гидроизоляция ЖБИ 1,5м'; }
+                    else if (kessonType.includes('jbi_2m')) { gidroPrice = 12000; gidroName = 'Гидроизоляция ЖБИ 2м'; }
+                    if (gidroPrice) {
+                        positions.push({ name: gidroName, qty: 1, unit: 'шт', price: gidroPrice, sum: gidroPrice, sebest: gidroPrice * 0.5 });
+                        total += gidroPrice;
+                        totalSebest += gidroPrice * 0.5;
+                    }
+                }
+            }
+
+            // 4. ВВОД ВОДЫ
+            const vvodPrice = VVOD[freezeDepth] || 3200;
+            const vvodSum = vvodPrice * waterDistance;
+            positions.push({
+                name: `Водопроводная линия (${freezeDepth === '1m' ? 'до 1м' : freezeDepth === '1_8m' ? 'до 1,8м' : 'до 2,5м'})`,
+                qty: waterDistance, unit: 'м', price: vvodPrice, sum: vvodSum, sebest: vvodSum * 0.55
+            });
+            total += vvodSum;
+            totalSebest += vvodSum * 0.55;
+
+            // 5. АВТОМАТИКА
+            if (autoType !== 'none') {
+                const avto = AVTOMATIKA[autoType];
+                positions.push({ name: avto.name, qty: 1, unit: 'компл', price: avto.roz, sum: avto.roz, sebest: avto.sebest });
+                total += avto.roz;
+                totalSebest += avto.sebest;
+            }
+
+            if (hydroType !== 'none') {
+                const hydroPrice = HYDRO[hydroType];
+                positions.push({ name: `Гидроаккумулятор ${hydroType}л`, qty: 1, unit: 'шт', price: hydroPrice, sum: hydroPrice, sebest: hydroPrice * 0.72 });
+                total += hydroPrice;
+                totalSebest += hydroPrice * 0.72;
+            }
+
+            // Допы
+            if (document.getElementById('add_filter').checked) {
+                positions.push({ name: 'Корпус фильтра ББ10 + картридж', qty: 1, unit: 'компл', price: 2800, sum: 2800, sebest: 2300 });
+                total += 2800;
+                totalSebest += 2300;
+            }
+            if (document.getElementById('add_poliv').checked) {
+                positions.push({ name: 'Монтаж летнего полива', qty: 1, unit: 'шт', price: 4000, sum: 4000, sebest: 1000 });
+                total += 4000;
+                totalSebest += 1000;
+            }
+
+            // 6. КАНАЛИЗАЦИЯ
+            let kanalTotal = 0;
+            if (needKanal) {
+                const kanalPrice = KANAL.naruzh * kanalLength;
+                positions.push({ name: 'Наружная канализация 110 с греющим кабелем', qty: kanalLength, unit: 'м', price: KANAL.naruzh, sum: kanalPrice, sebest: kanalPrice * 0.59 });
+                total += kanalPrice;
+                totalSebest += kanalPrice * 0.59;
+                kanalTotal += kanalPrice;
+
+                positions.push({ name: 'Точки выхода канализации под домом', qty: 1, unit: 'компл', price: 3100, sum: 3100, sebest: 1792 });
+                total += 3100;
+                totalSebest += 1792;
+                kanalTotal += 3100;
+
+                // Септик
+                const septikType = document.getElementById('septik_type').value;
+                if (septikType !== 'none') {
+                    let septik = null;
+                    let septikName = '';
+                    let septikPrice = 0;
+                    let septikSebest = 0;
+
+                    if (septikType === 'drenaj') {
+                        if (peopleCount <= 3) { septik = SEPTIKI.drenaj_800; }
+                        else { septik = SEPTIKI.drenaj_1000; }
+                    } else if (septikType === 'jbi') {
+                        if (peopleCount <= 4) { septik = SEPTIKI.jbi_1_5_k2; }
+                        else if (peopleCount <= 6) { septik = SEPTIKI.jbi_1_5_k3; }
+                        else { septik = SEPTIKI.jbi_2m; }
+                    } else if (septikType === 'metal') {
+                        if (peopleCount <= 5) { septik = SEPTIKI.metal_5; }
+                        else { septik = SEPTIKI.metal_10; }
+                    } else if (septikType === 'aos') {
+                        // Подбор АОС по количеству людей
+                        const sutVoda = peopleCount * 200; // л/сут
+                        const zalpNeed = peopleCount * 60; // л
+                        let aosArr = AOS_ECO;
+                        let selectedAos = aosArr.find(a => a.sut >= sutVoda) || aosArr[aosArr.length - 1];
+                        septikName = selectedAos.name;
+                        septikPrice = selectedAos.roz;
+                        septikSebest = selectedAos.sebest;
+                    }
+
+                    if (septik) {
+                        septikName = septik.name;
+                        septikPrice = septik.roz;
+                        septikSebest = septik.sebest;
+                    }
+
+                    positions.push({ name: `Септик: ${septikName}`, qty: 1, unit: 'шт', price: septikPrice, sum: septikPrice, sebest: septikSebest });
+                    total += septikPrice;
+                    totalSebest += septikSebest;
+                    kanalTotal += septikPrice;
+                }
+            }
+
+            // === ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ ===
+            document.getElementById('results').classList.add('show');
+            document.getElementById('total_price').textContent = formatPrice(total);
+
+            // Распределение по категориям
+            let catBurenie = bureniePrice + (conductor ? 39000 : 0) + transportPrice;
+            let catNasos = pumpPrice + 10900 + cablePrice + pndPrice;
+            let catObust = obustPrice;
+            let catVvod = vvodSum;
+            let catAvto = (autoType !== 'none' ? AVTOMATIKA[autoType].roz : 0) + (hydroType !== 'none' ? HYDRO[hydroType] : 0);
+            let catKanal = kanalTotal;
+
+            document.getElementById('total_burenie').textContent = formatPrice(catBurenie);
+            document.getElementById('total_nasos').textContent = formatPrice(catNasos);
+            document.getElementById('total_obust').textContent = formatPrice(catObust);
+            document.getElementById('total_vvod').textContent = formatPrice(catVvod);
+            document.getElementById('total_avto').textContent = formatPrice(catAvto);
+            document.getElementById('total_kanal').textContent = formatPrice(catKanal);
+
+            // Формируем таблицу позиций
+            let html = `
+                <div class="result-card">
+                    <h3>📋 Детализация по позициям <span class="result-price">${formatPrice(total)}</span></h3>
+                    <table class="result-table">
+                        <thead>
+                            <tr><th>№</th><th>Наименование</th><th>Кол-во</th><th>Ед.</th><th>Цена</th><th>Сумма</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            positions.forEach((p, i) => {
+                html += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${p.name}</td>
+                    <td>${p.qty}</td>
+                    <td>${p.unit}</td>
+                    <td class="price-cell">${formatPrice(p.price)}</td>
+                    <td class="price-cell">${formatPrice(p.sum)}</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+
+            // Рекомендации
+            let recHtml = '<div class="result-card"><h3>💡 Рекомендации и альтернативы</h3>';
+
+            // Рекомендация по насосу
+            const altPumps = suitablePumps.slice(0, 3);
+            recHtml += `<div class="recommendation">
+                <strong>🔌 Подобранные насосы (по возрастанию цены):</strong>
+                <ul style="margin-top:8px; padding-left:20px;">
+                    ${altPumps.map((p, i) => `<li><b>${p.name}</b> — ${formatPrice(p.roz)} 
+                        <span class="badge ${i === 0 ? 'badge-recommended' : i === 1 ? 'badge-economy' : 'badge-premium'}">
+                        ${i === 0 ? 'РЕКОМЕНДУЕМ' : i === 1 ? 'АЛЬТЕРНАТИВА' : 'ПРЕМИУМ'}</span>
+                        <br><small>Дебит: ${p.debit} м³/ч, глубина: до ${p.depth}м</small></li>`).join('')}
+                </ul>
+            </div>`;
+
+            // Рекомендация по кессону
+            if (kessonType === 'none') {
+                recHtml += `<div class="recommendation">
+                    <strong>🏠 Обустройство скважины не выбрано!</strong><br>
+                    Рекомендуем: <b>ЖБИ кессон Ø1м</b> (${formatPrice(55000)}) — надежное решение для Тюмени.<br>
+                    Бюджетный вариант: <b>Скважинный адаптер</b> (${formatPrice(21000)}).<br>
+                    Премиум: <b>Пластиковый кессон</b> (${formatPrice(50000)}) — долговечный, не подвержен коррозии.
+                </div>`;
+            }
+
+            // Рекомендация по автоматике
+            if (autoType === 'none') {
+                recHtml += `<div class="recommendation">
+                    <strong>⚡ Автоматика не выбрана!</strong><br>
+                    Для скважины обязательно нужна автоматика. Рекомендуем: 
+                    <b>Реле давления</b> (${formatPrice(37000)}) — стандартное решение.<br>
+                    Премиум: <b>Частотник</b> (${formatPrice(35000)}) — плавный пуск, экономия электроэнергии.
+                </div>`;
+            }
+
+            // Рекомендация по септику
+            if (needKanal && document.getElementById('septik_type').value === 'none') {
+                recHtml += `<div class="recommendation">
+                    <strong>🚿 Септик не выбран!</strong><br>
+                    Для ${peopleCount} чел. рекомендуем:
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Дренаж ЖБИ К2</b> — ${formatPrice(49000)} (бюджет)</li>
+                        <li><b>ЖБИ септик 1,5м 2К2</b> — ${formatPrice(109000)} (стандарт)</li>
+                        <li><b>АОС ЕВРОЛОС ЭКО 5</b> — ${formatPrice(118800)} (биоочистка, премиум)</li>
+                    </ul>
+                </div>`;
+            }
+
+            // Скидка
+            const discount = Math.round(total * 0.05);
+            recHtml += `<div class="recommendation" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-color: #4caf50;">
+                <strong>🎁 Специальное предложение:</strong><br>
+                При заказе комплекса «под ключ» — скидка <b>5%</b> = <b>${formatPrice(discount)}</b><br>
+                <b>Итого со скидкой: ${formatPrice(total - discount)}</b>
+            </div>`;
+
+            recHtml += '</div>';
+            html += recHtml;
+
+            document.getElementById('recommendations').innerHTML = html;
+
+            // Прокрутка к результатам
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // === ОЧИСТКА ФОРМЫ ===
+        function clearForm() {
+            if (!confirm('Очистить все поля для нового расчёта?')) return;
+
+            // Сброс всех input type="number"
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.value = input.getAttribute('value') || '';
+            });
+
+            // Сброс всех select к первому значению
+            document.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+
+            // Сброс всех checkbox
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Сброс визуальных checkbox-item
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Скрыть результаты
+            document.getElementById('results').classList.remove('show');
+
+            // Скрыть условные секции
+            document.getElementById('kanal_section').classList.add('hidden');
+            document.getElementById('kanal_section').classList.remove('show');
+
+            // Вернуть значения по умолчанию для ключевых полей
+            document.getElementById('distance').value = 25;
+            document.getElementById('depth').value = 40;
+            document.getElementById('cable_length').value = 45;
+            document.getElementById('water_distance').value = 15;
+            document.getElementById('kanal_length').value = 10;
+            document.getElementById('people_count').value = 4;
+
+            // Установить значения по умолчанию для select
+            document.getElementById('ugv').value = 'normal';
+            document.getElementById('purpose').value = 'drinking';
+            document.getElementById('pipe_diameter').value = '125';
+            document.getElementById('conductor').value = 'no';
+            document.getElementById('water_need').value = 'medium';
+            document.getElementById('pump_type').value = 'auto';
+            document.getElementById('kesson_type').value = 'none';
+            document.getElementById('pogreb').value = 'no';
+            document.getElementById('freeze_depth').value = '1_8m';
+            document.getElementById('auto_type').value = 'rele';
+            document.getElementById('hydro_type').value = '50';
+            document.getElementById('need_kanal').value = 'no';
+            document.getElementById('septik_type').value = 'none';
+            document.getElementById('living_mode').value = 'permanent';
+
+            // Прокрутка наверх
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
